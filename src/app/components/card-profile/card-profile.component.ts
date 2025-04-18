@@ -157,9 +157,13 @@ export class CardProfileComponent implements OnInit {
   }
 
   getActivityImageId(imageUrl: string): string {
-    if (imageUrl && imageUrl.startsWith('spotify:')) {
+    if (!imageUrl) {
+      return '';
+    }
+    
+    if (imageUrl.startsWith('spotify:')) {
       const parts = imageUrl.split(':');
-      return parts[1];
+      return parts[1] || '';
     } else {
       return imageUrl;
     }

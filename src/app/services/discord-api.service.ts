@@ -68,6 +68,9 @@ export class DiscordApiService {
 
   // Badge URL'sini hazırlar
   getBadgeUrl(badgeId: string): string {
+    if (!badgeId) {
+      return '../../../assets/images/no-image-found.png';
+    }
     // Badge URL'lerini şimdilik sabit bir konumdan alıyoruz
     return `../../../assets/images/badges/${badgeId}.png`;
   }

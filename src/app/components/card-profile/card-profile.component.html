@@ -29,11 +29,11 @@
                     </div>
                   </a>
                   <div class="badges-container">
-                    @for (badge of userData?.badges; track $index) {
+                    @for (badge of userData?.badges || []; track $index) {
                       <div class="badge-item">
                         <a href="{{badge.link || ''}}" target="_blank" class="badge-link">
-                          <img [src]="getBadgeUrl(badge.icon)" alt="{{badge.id}}" />
-                          <div class="tooltip tooltip-up">{{badge.description}}</div>
+                          <img [src]="getBadgeUrl(badge.icon || '')" alt="{{badge.id || ''}}" />
+                          <div class="tooltip tooltip-up">{{badge.description || ''}}</div>
                         </a>
                       </div>
                     }
@@ -41,7 +41,7 @@
                 </div>
                 <div class="profile-body" data-atropos-offset="2.5">
                   <div class="global-name flex justify-between items-center">
-                    <p>{{userData?.user?.global_name || userData?.user?.username}}</p>
+                    <p>{{userData?.user?.global_name || userData?.user?.username || ''}}</p>
                     <div class="flex flex-wrap gap-2 items-center">
                       @if (lanyardData?.d?.active_on_discord_desktop) {
                         <svg aria-label="Desktop" height="20" width="20" viewBox="0 0 24 24" [attr.fill]="statusColor"><path d="M4 2.5c-1.103 0-2 .897-2 2v11c0 1.104.897 2 2 2h7v2H7v2h10v-2h-4v-2h7c1.103 0 2-.896 2-2v-11c0-1.103-.897-2-2-2H4Zm16 2v9H4v-9h16Z"></path></svg>
@@ -55,16 +55,16 @@
                     </div>
                   </div>
                   <div class="username">
-                    <p>{{userData?.user?.username}}</p>
+                    <p>{{userData?.user?.username || ''}}</p>
                   </div>
                   <div class="pronouns">
                     <p>{{userData?.user_profile?.pronouns || ''}}</p>
                   </div>
                   <hr />
-                  @if (userData?.user_profile?.bio!.length > 0) {
+                  @if (userData?.user_profile?.bio && userData.user_profile.bio.length > 0) {
                     <div class="basic-infos">
                       <div class="category-title">Hakkımda</div>
-                      <markdown class="markdown" [data]="userBioFormatted" [inline]="false"></markdown>
+                      <markdown class="markdown" [data]="userBioFormatted || ''" [inline]="false"></markdown>
                     </div>
                   }
                   @if (lanyardActivities.length > 0) {
@@ -74,50 +74,50 @@
                         <div class="flex items-center gap-4 my-4">
                           <div class="activity-icon">
                             @if (activity.name === 'Spotify') {
-                              <a href="https://open.spotify.com/track/{{activity.sync_id}}" target="_blank" class="link">
-                                <img class="large-img" [src]="'https://i.scdn.co/image/' + getActivityImageId(activity.assets?.large_image || '')" (error)="handleImageError($event)" alt="{{activity.type}}" />
+                              <a href="https://open.spotify.com/track/{{activity.sync_id || ''}}" target="_blank" class="link">
+                                <img class="large-img" [src]="'https://i.scdn.co/image/' + getActivityImageId(activity.assets?.large_image || '')" (error)="handleImageError($event)" alt="{{activity.type || ''}}" />
                                 @if (activity.assets?.small_image) {
-                                  <img class="small-img" [src]="'https://i.scdn.co/image/' + getActivityImageId(activity.assets?.small_image || '')" (error)="handleImageError($event)" alt="{{activity.type}}" />
+                                  <img class="small-img" [src]="'https://i.scdn.co/image/' + getActivityImageId(activity.assets?.small_image || '')" (error)="handleImageError($event)" alt="{{activity.type || ''}}" />
                                 }
                               </a>
                             } @else {
-                              <img class="large-img" src="https://cdn.discordapp.com/app-assets/{{activity.application_id}}/{{activity.assets?.large_image}}.png" (error)="handleImageError($event)" alt="{{activity.type}}" />
+                              <img class="large-img" src="https://cdn.discordapp.com/app-assets/{{activity.application_id || ''}}/{{activity.assets?.large_image || ''}}.png" (error)="handleImageError($event)" alt="{{activity.type || ''}}" />
                               @if (activity.assets?.small_image) {
-                                <img class="small-img" src="https://cdn.discordapp.com/app-assets/{{activity.application_id}}/{{activity.assets?.small_image}}.png" (error)="handleImageError($event)" alt="{{activity.type}}" />
+                                <img class="small-img" src="https://cdn.discordapp.com/app-assets/{{activity.application_id || ''}}/{{activity.assets?.small_image || ''}}.png" (error)="handleImageError($event)" alt="{{activity.type || ''}}" />
                               }
                             }
                           </div>
                           <div class="activity-info">
                             @if (activity.name === 'Spotify') {
-                              <p class="font-bold spotify-title">{{activity.name}}</p>
-                              <a href="https://open.spotify.com/track/{{activity.sync_id}}" target="_blank" class="spotify-link">{{activity.details}}</a>
+                              <p class="font-bold spotify-title">{{activity.name || ''}}</p>
+                              <a href="https://open.spotify.com/track/{{activity.sync_id || ''}}" target="_blank" class="spotify-link">{{activity.details || ''}}</a>
                             } @else {
-                              <p class="font-bold">{{activity.name}}</p>
-                              <p>{{activity.details}}</p>
+                              <p class="font-bold">{{activity.name || ''}}</p>
+                              <p>{{activity.details || ''}}</p>
                             }
-                            <p>{{activity.state}}</p>
-                            <p>{{activity.timestamps?.start}}</p>
+                            <p>{{activity.state || ''}}</p>
+                            <p>{{activity.timestamps?.start || ''}}</p>
                           </div>
                         </div>
                       }
                     </div>
                   }
 
-                  @if (userData?.connected_accounts!.length > 0) {
+                  @if (userData?.connected_accounts && userData.connected_accounts.length > 0) {
                     <div class="connected-accounts">
                       <div class="category-title">Bağlantılı Hesaplar</div>
                       <div class="badges-connected-accounts">
-                        @for (account of userData?.connected_accounts; track $index) {
+                        @for (account of userData.connected_accounts; track $index) {
                           <div class="badge-connected-account">
-                            <img src="../../../assets/images/connections/{{account.type}}.svg" alt="{{account.type}}" width="24px" height="24px" />
-                            <div class="tooltip tooltip-down">{{account.name}}</div>
+                            <img src="../../../assets/images/connections/{{account.type || 'unknown'}}.svg" alt="{{account.type || 'unknown'}}" width="24px" height="24px" />
+                            <div class="tooltip tooltip-down">{{account.name || ''}}</div>
                           </div>
                         }
                       </div>
                     </div>
                   }
                   <div class="message">
-                    <input type="text" placeholder="@{{userData?.user?.username}} Kullanıcısına mesaj gönder." [(ngModel)]="message" (keyup.enter)="sendMessage()"/>
+                    <input type="text" placeholder="@{{userData?.user?.username || ''}} Kullanıcısına mesaj gönder." [(ngModel)]="message" (keyup.enter)="sendMessage()"/>
                   </div>
                 </div>
               </div>
