@@ -19,14 +19,7 @@ declare global {
 export class CardProfileComponent implements OnInit {
 
   userId = environment.discordId;
-  
-  // Yerel resimleri varsayılan olarak kullanıyoruz
-  userAvatarUrl = '../../../assets/images/avatar.png';
-  userBannerUrl = '../../../assets/images/banner.jpg';
-  
-  // Discord CDN URL'leri
-  discordCdnUrl = 'https://cdn.discordapp.com/';
-  
+  apiUrl = environment.apiUrl;
   userDataStatus = false;
   userData?: Profile;
   userBioFormatted?: string;
@@ -51,7 +44,7 @@ export class CardProfileComponent implements OnInit {
         this.userData = data;
 
         // Change all the /n to <br>
-        this.userBioFormatted = this.userData.user_profile?.bio?.replace(/\n/g, '<br>');
+        this.userBioFormatted = this.userData.user_profile?.bio?.replace(/\n/g, '<br>') || '';
 
         const themeColors = this.userData.user_profile?.theme_colors || [];
         if (themeColors.length === 0) {
@@ -72,6 +65,27 @@ export class CardProfileComponent implements OnInit {
     });
   }
 
+  // Avatar URL'si için yardımcı metod
+  public getAvatarUrl(): string {
+    if (!this.userData?.user?.avatar) {
+      return this.discordApiService.getAvatarUrl(this.userId);
+    }
+    return `https://cdn.discordapp.com/avatars/${this.userId}/${this.userData.user.avatar}.png`;
+  }
+
+  // Banner URL'si için yardımcı metod
+  public getBannerUrl(): string {
+    if (!this.userData?.user?.banner) {
+      return '';
+    }
+    return `https://cdn.discordapp.com/banners/${this.userId}/${this.userData.user.banner}.png`;
+  }
+
+  // Badge URL'si için yardımcı metod
+  public getBadgeUrl(badgeId: string): string {
+    return this.discordApiService.getBadgeUrl(badgeId);
+  }
+
   public getLanyardData(): void {
     this.lanyardService.setupWebSocket();
 
@@ -79,24 +93,6 @@ export class CardProfileComponent implements OnInit {
       next: (data) => {
         this.lanyardData = data;
 
-        // Lanyard'dan kullanıcı bilgilerini al ve userData'yı güncelle
-        if (this.lanyardData?.d?.discord_user) {
-          const discordUser = this.lanyardData.d.discord_user;
-          
-          // userData güncelleniyor
-          if (this.userData && this.userData.user) {
-            this.userData.user.username = discordUser.username || this.userData.user.username;
-            this.userData.user.global_name = discordUser.global_name || discordUser.username || this.userData.user.global_name;
-            this.userData.user.discriminator = discordUser.discriminator || this.userData.user.discriminator;
-          }
-
-          // Lanyard'dan avatar URL alınıyor
-          if (discordUser.avatar) {
-            this.userAvatarUrl = `${this.discordCdnUrl}avatars/${this.userId}/${discordUser.avatar}.png`;
-          }
-        }
-
-        // Aktiviteler alınıyor
         this.lanyardActivities = this.lanyardData.d?.activities || [];
 
         // Format the timestamps of the activities
@@ -178,4 +174,4 @@ export class CardProfileComponent implements OnInit {
   handleImageError(event: any) {
     event.target.src = '../../../assets/images/no-image-found.png';
   }
-} 
+}
