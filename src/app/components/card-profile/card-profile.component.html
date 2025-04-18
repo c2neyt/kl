@@ -15,7 +15,7 @@
                       <img class="avatar-decoration" src="https://cdn.discordapp.com/avatar-decoration-presets/{{userData?.user?.avatar_decoration_data?.asset}}.png" alt="Avatar decoration">
                     }
                     <div class="profile-logo">
-                      <img src="{{userAvatarUrl}}" alt="Avatar"/>
+                      <img [src]="userAvatarUrl" (error)="handleImageError($event)" alt="Avatar"/>
                       <div class="presence-state" [ngClass]="{
                         'online': lanyardData?.d?.discord_status === 'online',
                         'idle': lanyardData?.d?.discord_status === 'idle',
@@ -127,4 +127,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> 

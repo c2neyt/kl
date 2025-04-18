@@ -18,8 +18,8 @@ export class DiscordApiService {
     const mockProfile: Profile = {
       user: {
         id: id,
-        username: 'Juan VI Britannia',
-        global_name: 'Juan VI Britannia',
+        username: 'Kullanıcı',
+        global_name: 'Kullanıcı', // Lanyard'dan alınacak
         avatar: 'default_avatar',
         discriminator: '0',
         bio: 'Web Developer',
@@ -42,4 +42,4 @@ export class DiscordApiService {
     
     return of(mockProfile);
   }
-}
+} 

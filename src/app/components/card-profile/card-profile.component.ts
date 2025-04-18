@@ -19,10 +19,13 @@ declare global {
 export class CardProfileComponent implements OnInit {
 
   userId = environment.discordId;
-  // API URL'yi artık kullanmayacağız, bunun yerine yerel asset'leri kullanacağız
-  // apiUrl = environment.apiUrl;
-  userAvatarUrl = '../../../assets/images/avatar.png'; // Varsayılan avatar resmi
-  userBannerUrl = '../../../assets/images/banner.jpg'; // Varsayılan banner resmi
+  
+  // Yerel resimleri varsayılan olarak kullanıyoruz
+  userAvatarUrl = '../../../assets/images/avatar.png';
+  userBannerUrl = '../../../assets/images/banner.jpg';
+  
+  // Discord CDN URL'leri
+  discordCdnUrl = 'https://cdn.discordapp.com/';
   
   userDataStatus = false;
   userData?: Profile;
@@ -38,7 +41,6 @@ export class CardProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.getDiscordUserData();
-
     this.getLanyardData();
   }
 
@@ -77,6 +79,24 @@ export class CardProfileComponent implements OnInit {
       next: (data) => {
         this.lanyardData = data;
 
+        // Lanyard'dan kullanıcı bilgilerini al ve userData'yı güncelle
+        if (this.lanyardData?.d?.discord_user) {
+          const discordUser = this.lanyardData.d.discord_user;
+          
+          // userData güncelleniyor
+          if (this.userData && this.userData.user) {
+            this.userData.user.username = discordUser.username || this.userData.user.username;
+            this.userData.user.global_name = discordUser.global_name || discordUser.username || this.userData.user.global_name;
+            this.userData.user.discriminator = discordUser.discriminator || this.userData.user.discriminator;
+          }
+
+          // Lanyard'dan avatar URL alınıyor
+          if (discordUser.avatar) {
+            this.userAvatarUrl = `${this.discordCdnUrl}avatars/${this.userId}/${discordUser.avatar}.png`;
+          }
+        }
+
+        // Aktiviteler alınıyor
         this.lanyardActivities = this.lanyardData.d?.activities || [];
 
         // Format the timestamps of the activities
@@ -158,4 +178,4 @@ export class CardProfileComponent implements OnInit {
   handleImageError(event: any) {
     event.target.src = '../../../assets/images/no-image-found.png';
   }
-}
+} 
