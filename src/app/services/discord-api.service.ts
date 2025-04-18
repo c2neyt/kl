@@ -18,9 +18,20 @@ export class DiscordApiService {
   constructor(private http: HttpClient, private lanyardService: LanyardService) { }
 
   getDiscordUser(id: string): Observable<Profile> {
+    // Log user ID for debugging
+    console.log('Fetching user with ID:', id);
+    
     // Lanyard API kullanarak kullanıcı bilgilerini al
     return this.http.get<any>(`${this.lanyardApiUrl}/users/${id}`).pipe(
       map(lanyardData => {
+        console.log('Lanyard data received:', lanyardData);
+        
+        // Response yapısını kontrol et
+        if (!lanyardData || !lanyardData.data || !lanyardData.data.discord_user) {
+          console.error('Invalid response format from Lanyard API');
+          return this.getEmptyProfile(id);
+        }
+        
         // Lanyard verilerini Profile modeline dönüştür
         const discordUser = lanyardData.data.discord_user;
         const activities = lanyardData.data.activities || [];
@@ -29,11 +40,11 @@ export class DiscordApiService {
         const profile: Profile = {
           user: {
             id: discordUser.id,
-            username: discordUser.username,
-            global_name: discordUser.global_name,
+            username: discordUser.username || 'Unknown',
+            global_name: discordUser.global_name || discordUser.username || 'Unknown',
             avatar: discordUser.avatar,
-            discriminator: discordUser.discriminator,
-            public_flags: discordUser.public_flags,
+            discriminator: discordUser.discriminator || '0000',
+            public_flags: discordUser.public_flags || 0,
             bio: '' // Lanyard doesn't provide this
           },
           user_profile: {
@@ -45,6 +56,7 @@ export class DiscordApiService {
           connected_accounts: [] // Lanyard doesn't provide connected accounts
         };
         
+        console.log('Converted profile:', profile);
         return profile;
       }),
       catchError(error => {
@@ -56,8 +68,14 @@ export class DiscordApiService {
   }
 
   // Avatar URL'sini hazırlar
-  getAvatarUrl(userId: string): string {
-    const defaultAvatarIndex = parseInt(userId) % 5;
+  getAvatarUrl(userId: string, avatarHash?: string): string {
+    // Kullanıcı avatar'ı varsa onu kullan
+    if (avatarHash) {
+      return `${this.discordCdnUrl}/avatars/${userId}/${avatarHash}.png`;
+    }
+    
+    // Yoksa, default avatar kullan
+    const defaultAvatarIndex = parseInt(userId.slice(-1)) % 5;
     return `${this.discordCdnUrl}/embed/avatars/${defaultAvatarIndex}.png`;
   }
 

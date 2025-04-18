@@ -38,8 +38,11 @@ export class CardProfileComponent implements OnInit {
   }
 
   public getDiscordUserData(): void {
+    console.log('Getting Discord user data for ID:', this.userId);
+    
     this.discordApiService.getDiscordUser(this.userId).subscribe({
       next: (data: Profile) => {
+        console.log('Discord user data received:', data);
         this.userDataStatus = true;
         this.userData = data;
 
@@ -57,20 +60,18 @@ export class CardProfileComponent implements OnInit {
         }
       },
       error: (error) => {
+        console.error('Error getting Discord user data:', error);
         this.userDataStatus = false;
-        console.log(error);
       }
     }).add(() => {
+      console.log('Discord user data request completed');
       window.loadAtropos();
     });
   }
 
   // Avatar URL'si için yardımcı metod
   public getAvatarUrl(): string {
-    if (!this.userData?.user?.avatar) {
-      return this.discordApiService.getAvatarUrl(this.userId);
-    }
-    return `https://cdn.discordapp.com/avatars/${this.userId}/${this.userData.user.avatar}.png`;
+    return this.discordApiService.getAvatarUrl(this.userId, this.userData?.user?.avatar);
   }
 
   // Banner URL'si için yardımcı metod
